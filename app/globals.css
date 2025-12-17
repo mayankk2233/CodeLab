@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Base Theme Variables ---------- */
+:root {
+  --bg-dark: #0E0F11;   /* softer, premium dark background */
+  --card-dark: #16171A; /* subtle dark card, not black */
+  --text-dark: #E5E7EB; /* slightly warm gray-white */
+}
+
+/* Smooth color transitions */
+body {
+  @apply transition-colors duration-300;
+}
+
+/* ---------- LIGHT MODE ---------- */
+html:not(.dark) body {
+  @apply bg-white text-neutral-900;
+}
+
+/* Default card + shared UI styling */
+.container { @apply max-w-5xl mx-auto px-4; }
+.card { 
+  @apply rounded-2xl border bg-white shadow-sm border-neutral-200;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  transition: 150ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium transition;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #ffffff;
+}
+
+.btn:hover {
+  background: #f3f4f6;
+}
+
+.btn-primary {
+  background: #4C6EF5;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+.btn-primary:hover {
+  background: #3B5BDB;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #E2E8F0;
+  padding: 8px 18px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+.btn-secondary:hover {
+  background: #E8EDF9;
+}
+
+input, select, textarea { @apply w-full border rounded-xl px-3 py-2; }
+label { @apply text-sm font-medium text-neutral-700; }
+
+.badge { @apply inline-flex items-center rounded-lg border px-2 py-0.5 text-xs; }
+
+/* ---------- PAGE TRANSITION ---------- */
+.page-fade {
+  animation: fadeIn 0.35s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- DROPDOWN MENU ---------- */
+.menu { position: relative; }
+.menu-content {
+  position: absolute; right: 0; top: 120%;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 180px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  z-index: 50;
+}
+.menu-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111;
+}
+.menu-item:hover { background: #f5f5f5; }
+
+/* =========================================================
+   DARK MODE — Applies only when <html class="dark">
+   ========================================================= */
+
+   /* Make all text inherit proper contrast */
+html:not(.dark) * {
+  color-scheme: light;
+}
+
+html.dark * {
+  color-scheme: dark;
+}
+html.dark body {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* Cards */
+html.dark .card {
+  background: var(--card-dark) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: var(--text-dark) !important;
+  box-shadow: none !important;
+}
+
+/* Navbar */
+html.dark nav {
+  background: rgba(20,20,24,0.6);
+  backdrop-filter: blur(16px);
+}
+
+/* Buttons */
+html.dark .btn {
+  background: #1a1a1c !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color: var(--text-dark) !important;
+}
+html.dark .btn:hover {
+  background: #2a2a2d !important;
+}
+
+/* Dropdown Menu Dark */
+html.dark .menu-content {
+  background: #101113;
+  border-color: rgba(255,255,255,0.08);
+}
+html.dark .menu-item {
+  color: #e5e7eb;
+}
+html.dark .menu-item:hover {
+  background: rgba(255,255,255,0.06);
+}

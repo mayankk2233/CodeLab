@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  image         String?
+  emailVerified DateTime?
+  accounts      Account[]
+  sessions      Session[]
+  submissions   Submission[]
+  role          Role     @default(USER)
+  xp            Int      @default(0)
+  level         Int      @default(1)
+
+  createdAt     DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Problem {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  difficulty  Difficulty
+  description String
+  examples    Json
+  tags        String[]
+  createdAt   DateTime @default(now())
+  submissions Submission[]
+  testCases   TestCase[]
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model TestCase {
+  id         String  @id @default(cuid())
+  problemId  String
+  input      String
+  expected   String
+  isHidden   Boolean @default(true)
+  problem    Problem @relation(fields: [problemId], references: [id])
+}
+
+model Submission {
+  id         String   @id @default(cuid())
+  userId     String?                             // now optional
+  user       User?      @relation(fields: [userId], references: [id])
+  problemId  String
+  problem    Problem    @relation(fields: [problemId], references: [id])
+  language   String
+  code       String
+  status     SubmissionStatus
+  stdout     String?
+  stderr     String?
+  createdAt  DateTime   @default(now())
+}
+
+enum SubmissionStatus {
+  PASSED
+  FAILED
+  ERROR
+  RUNTIME_ERROR
+  COMPILE_ERROR
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
