@@ -74,9 +74,11 @@ export async function POST(req: NextRequest) {
 
     try {
       const session = await auth();
-      const sid = (session as any)?.user?.id;
-      if (sid) userId = sid;
-    } catch {}
+      userId = session?.user?.id || null;
+    } catch (error) {
+      // User not logged in - continue without user ID
+      console.log('[SUBMIT] No authenticated user');
+    }
 
     // ---- Run all testcases ----
     let passed = 0;
@@ -89,7 +91,11 @@ export async function POST(req: NextRequest) {
 
       const result = await runJudge(language, code, input);
 
-      if (result.output.trim() === t.expected.trim()) {
+      // Normalize output comparison (handle whitespace differences)
+      const normalizeOutput = (str: string) =>
+        str.trim().replace(/\s+/g, ' ');
+
+      if (normalizeOutput(result.output) === normalizeOutput(t.expected)) {
         passed++;
       }
     }
@@ -134,9 +140,19 @@ export async function POST(req: NextRequest) {
       passed: allPassed,
     });
   } catch (err: any) {
-    console.log("SUBMIT ERROR:", err?.response?.data || err);
+    // Detailed error logging
+    console.error('[SUBMIT_ERROR]', {
+      error: err?.response?.data || err.message,
+      timestamp: new Date().toISOString()
+    });
+
+    // User-friendly error message
+    const errorMessage = err?.response?.data?.error ||
+      err.message ||
+      "Submission failed. Please try again.";
+
     return NextResponse.json(
-      { error: "Submit failed" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -2,25 +2,16 @@
 
 import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ProblemFilters from "@/components/ProblemFilters";
 
 const PAGE_SIZE = 25;
 
 export default function ProblemsClient({ initialProblems }: { initialProblems: any[] }) {
+  const router = useRouter();
   const [problems, setProblems] = useState(initialProblems);
   const [filtered, setFiltered] = useState(initialProblems);
   const [page, setPage] = useState(1);
-
-  // Sync with server data
-  useEffect(() => {
-    setProblems(initialProblems);
-    setFiltered(initialProblems);
-    setPage(1);
-  }, [initialProblems]);
-
-  // Debug
-  useEffect(() => console.log("PAGE CHANGED ->", page), [page]);
-  useEffect(() => console.log("FILTERED LENGTH ->", filtered.length), [filtered]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
@@ -39,9 +30,9 @@ export default function ProblemsClient({ initialProblems }: { initialProblems: a
     setPage(1);
   }
 
-  function handleRowClick(e: any, slug: string) {
-    if (e.target.closest(".no-row-click")) return;
-    window.location.href = `/problems/${slug}`;
+  function handleRowClick(e: React.MouseEvent, slug: string) {
+    if (e.target instanceof Element && e.target.closest(".no-row-click")) return;
+    router.push(`/problems/${slug}`);
   }
 
   function getPageNumbers() {
@@ -103,13 +94,12 @@ export default function ProblemsClient({ initialProblems }: { initialProblems: a
 
                   <td className="px-2">
                     <span
-                      className={`px-2 py-1 rounded-md text-xs font-medium ${
-                        p.difficulty === "EASY"
+                      className={`px-2 py-1 rounded-md text-xs font-medium ${p.difficulty === "EASY"
                           ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                           : p.difficulty === "MEDIUM"
-                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        }`}
                     >
                       {p.difficulty}
                     </span>
@@ -145,7 +135,7 @@ export default function ProblemsClient({ initialProblems }: { initialProblems: a
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-4 no-row-click select-none">
-          
+
           {/* Prev */}
           <button
             onClick={(e) => {
@@ -174,11 +164,10 @@ export default function ProblemsClient({ initialProblems }: { initialProblems: a
                     setPage(Number(pg));
                   }}
                   className={`min-w-[32px] h-8 flex items-center justify-center rounded-md text-sm font-medium transition 
-                  ${
-                    page === pg
+                  ${page === pg
                       ? "bg-neutral-900 text-white dark:bg-white dark:text-black"
                       : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  }`}
+                    }`}
                 >
                   {pg}
                 </button>
